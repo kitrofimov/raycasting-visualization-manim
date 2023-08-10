@@ -1,6 +1,4 @@
 from manim import *
-import numpy as np
-from copy import deepcopy
 
 class TrigonometryProofsScene(Scene):
     def construct(self):
@@ -118,13 +116,8 @@ class TrigonometryProofsScene(Scene):
 
         self.wait()
 
-        # play P(x+px, y+py) animation
-        self.play(Transform(player_label_1, player_label_2))
-        player_label_3 = MathTex(r"P(x+px, y+py)")
-        player_label_3.move_to(RIGHT*3.5+UP*3)
-        self.play(Create(player_label_3))
-
         # play brace animations
+        self.play(Transform(player_label_1, player_label_2))
         self.play(Succession(
             Create(px_brace),
             Write(px_brace_label),
@@ -132,11 +125,15 @@ class TrigonometryProofsScene(Scene):
             Write(py_brace_label)
         ))
 
+        # play P(x+px, y+py) animation
+        player_label_3 = MathTex(r"P(x+px, y+py)")
+        player_label_3.move_to(RIGHT*3.5+UP*3)
+        self.play(Create(player_label_3, run_time=0.5))
+
         self.wait(3)
 
         # uncreate useless things
-        group = VGroup(zero_deg_line, ray_angle, ray_angle_label,
-                       px_brace, px_brace_label, py_brace, py_brace_label)
+        group = VGroup(zero_deg_line, ray_angle, ray_angle_label)
         self.play(Uncreate(group))
 
         self.wait()
@@ -159,9 +156,25 @@ class TrigonometryProofsScene(Scene):
 
         self.wait()
 
-        triangle_x_1_move = deepcopy(triangle_x_1)
+        triangle_x_1_move = triangle_x_1.copy()
         self.play(triangle_x_1_move.animate.move_to(RIGHT*3.5+UP))
         self.play(triangle_x_1_move.animate.scale(5))
 
+        vertices = triangle_x_1_move.get_vertices()
+        hyp_label = MathTex("c")
+        center_coordinates = Line(vertices[0], vertices[1]).get_center()
+        hyp_label.move_to([center_coordinates[0]-0.3, center_coordinates[1]+0.3, center_coordinates[2]])
+
+        edge_labels_and_angle = VGroup(
+            hyp_label,
+            MathTex("1-py").next_to(Line(vertices[1], vertices[2])),
+            MathTex("x_i").next_to(Line(vertices[2], vertices[0]), DOWN),
+            Angle(
+                Line(vertices[2], vertices[0]),
+                Line(vertices[2], vertices[1]),
+                elbow=True
+            )
+        )
+        self.play(Write(edge_labels_and_angle))
 
         self.wait()
