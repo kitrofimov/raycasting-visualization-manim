@@ -1,5 +1,6 @@
 from manim import *
 import numpy as np
+from copy import deepcopy
 
 class TrigonometryProofsScene(Scene):
     def construct(self):
@@ -97,33 +98,39 @@ class TrigonometryProofsScene(Scene):
         py_brace_label = MathTex("py").scale(0.5).next_to(py_brace, direction=LEFT, buff=0.1)
 
         # play number plane animations
-        self.play(Create(number_plane, run_time=3))
-        self.play(Create(blocks))
-        self.play(Write(labels))
-        self.play(Write(x_ticks_labels))
-        self.play(Write(y_ticks_labels))
+        self.play(Succession(
+            Create(number_plane, run_time=3),
+            Create(blocks),
+            Write(labels),
+            Write(x_ticks_labels),
+            Write(y_ticks_labels)
+        ))
 
         # play ray animations
-        self.play(Create(player_point, run_time=0.5))
-        self.play(Create(zero_deg_line, run_time=1))
-        self.play(Create(ray, run_time=1))
-        self.play(Create(ray_angle, run_time=0.5))
-        self.play(Write(player_label_1))
-        self.play(Write(ray_angle_label))
+        self.play(Succession(
+            Create(player_point, run_time=0.25),
+            Create(zero_deg_line, run_time=1),
+            Create(ray, run_time=1),
+            Create(ray_angle, run_time=0.5),
+            Write(player_label_1),
+            Write(ray_angle_label)
+        ))
 
         self.wait()
 
         # play P(x+px, y+py) animation
         self.play(Transform(player_label_1, player_label_2))
         player_label_3 = MathTex(r"P(x+px, y+py)")
-        player_label_3.move_to(RIGHT*3+UP*3)
+        player_label_3.move_to(RIGHT*3.5+UP*3)
         self.play(Create(player_label_3))
 
         # play brace animations
-        self.play(Create(px_brace))
-        self.play(Write(px_brace_label))
-        self.play(Create(py_brace))
-        self.play(Write(py_brace_label))
+        self.play(Succession(
+            Create(px_brace),
+            Write(px_brace_label),
+            Create(py_brace),
+            Write(py_brace_label)
+        ))
 
         self.wait(3)
 
@@ -134,20 +141,27 @@ class TrigonometryProofsScene(Scene):
 
         self.wait()
 
-        # create first triangle
+        # create x triangles
         triangle_x_1 = Polygon(
             number_plane.c2p(1.5, 1.5),
             number_plane.c2p(1.9, 2),
             number_plane.c2p(1.9, 1.5),
             color=RED
         )
-        self.play(Create(triangle_x_1))
-
-        # create second triangle
         triangle_x_2 = Polygon(
-            number_plane.c2p(1.5, 1.5),
             number_plane.c2p(1.9, 2),
-            number_plane.c2p(1.9, 1.5),
-            color=RED
+            number_plane.c2p(2.7, 3),
+            number_plane.c2p(2.7, 2),
+            color=YELLOW
         )
-        self.play(Create(triangle_x_2))
+        triangles_x = VGroup(triangle_x_1, triangle_x_2)
+        self.play(Create(triangles_x))
+
+        self.wait()
+
+        triangle_x_1_move = deepcopy(triangle_x_1)
+        self.play(triangle_x_1_move.animate.move_to(RIGHT*3.5+UP))
+        self.play(triangle_x_1_move.animate.scale(5))
+
+
+        self.wait()
