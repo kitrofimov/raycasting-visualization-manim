@@ -102,17 +102,17 @@ class TrigonometryProofsScene(Scene):
         ))
         self.wait(2)
 
-        px_brace = Brace(
+        p_x_brace = Brace(
             Line(number_plane.c2p(1, 1), number_plane.c2p(1.5, 1)),
             buff=0
         )
-        px_brace_label = MathTex("px").scale(0.5).next_to(px_brace, direction=DOWN, buff=0.1)
-        py_brace = Brace(
+        p_x_brace_label = MathTex("p_x").scale(0.5).next_to(p_x_brace, direction=DOWN, buff=0.1)
+        p_y_brace = Brace(
             Line(number_plane.c2p(1, 1), number_plane.c2p(1, 1.5)),
             buff=0,
             direction=LEFT
         )
-        py_brace_label = MathTex("py").scale(0.5).next_to(py_brace, direction=LEFT, buff=0.1)
+        p_y_brace_label = MathTex("p_y").scale(0.5).next_to(p_y_brace, direction=LEFT, buff=0.1)
 
         # transform Player to P
         player_label_2 = MathTex("P").scale(0.6).next_to(player_point, DOWN, buff=0.05)
@@ -120,14 +120,14 @@ class TrigonometryProofsScene(Scene):
 
         # play brace and explanation animations
         group_explain = VGroup(
-            MathTex(r"P \, (x+px, y+py)").move_to(RIGHT*3.5+UP*0.3),
+            MathTex(r"P \, (x+p_x, y+p_y)").move_to(RIGHT*3.5+UP*0.3),
             MathTex(r"\theta - \textrm{ray angle}").move_to(RIGHT*3.5+DOWN*0.3),
         )
         self.play(AnimationGroup(
-            Create(px_brace),
-            Write(px_brace_label),
-            Create(py_brace),
-            Write(py_brace_label),
+            Create(p_x_brace),
+            Write(p_x_brace_label),
+            Create(p_y_brace),
+            Write(p_y_brace_label),
             Write(group_explain)
         ))
 
@@ -165,19 +165,19 @@ class TrigonometryProofsScene(Scene):
         triangle_x_1_move = triangle_x_1.copy()
         title_text = MathTex(r"\textrm{Horizontal intersections}").move_to(RIGHT*3.5+UP*3)
         self.play(AnimationGroup(
-            triangle_x_1_move.animate.move_to(RIGHT*3.5+UP*1.25).scale(5),
+            triangle_x_1_move.animate.move_to(RIGHT*3.5+UP*1.25).scale(4.5),
             Write(title_text)
         ))
 
         # write labels for each edge of the triangle and draw angle
         vertices = triangle_x_1_move.get_vertices()
-        hypotenuse_label = MathTex("c")
+        hypotenuse_label = MathTex("c_1")
         center_coordinates = Line(vertices[0], vertices[1]).get_center()
         hypotenuse_label.move_to([center_coordinates[0]-0.3, center_coordinates[1]+0.3, center_coordinates[2]])
 
         edge_labels_and_angle = VGroup(
             hypotenuse_label,
-            MathTex("1-py").next_to(Line(vertices[1], vertices[2])),
+            MathTex("1-p_y").next_to(Line(vertices[1], vertices[2])),
             MathTex("x_i").next_to(Line(vertices[2], vertices[0]), DOWN),
             Angle(
                 Line(vertices[2], vertices[0]),
@@ -185,34 +185,237 @@ class TrigonometryProofsScene(Scene):
                 elbow=True
             )
         )
-        self.play(Write(edge_labels_and_angle, run_time=1))
+        self.play(Write(edge_labels_and_angle))
 
         # write the proof
-        proof_x = MathTex(
-            r"""\sin{\theta} &= \frac{1 - py}{c} \Rightarrow c = \frac{1-py}{\sin{\theta}} \\
-                \cos{\theta} &= \frac{x_i}{c} \Rightarrow x_i = c \cdot \cos{\theta} \\
-                x_i &= \frac{(1-py)\cos{\theta}}{\sin{\theta}} = \frac{1-py}{\tan{\theta}}""",
+        proof = MathTex(
+            r"""\sin{\theta} &= \frac{1 - p_y}{c_1} \Rightarrow c_1 = \frac{1-p_y}{\sin{\theta}} \\
+                \cos{\theta} &= \frac{x_i}{c_1} \Rightarrow x_i = c_1 \cdot \cos{\theta} \\
+                x_i &= \frac{(1-p_y)\cos{\theta}}{\sin{\theta}} = \frac{1-p_y}{\tan{\theta}}""",
             font_size=32
         ).move_to(RIGHT*3.5+DOWN*1.75)
 
-        self.play(Write(proof_x, run_time=5))
+        self.play(Write(proof, run_time=5))
         self.wait(10)
 
         # simplify proof
-        xi_formula = MathTex(r"x_i = \frac{1-py}{\tan{\theta}}").move_to(RIGHT*3.5+DOWN*1.75)
-        self.play(Transform(proof_x, xi_formula))
+        formula = MathTex(r"x_i = \frac{1-p_y}{\tan{\theta}}").move_to(RIGHT*3.5+DOWN*1.75)
+        self.play(Transform(proof, formula))
 
         self.wait(3)
 
         # delete this triangle and formula
         self.play(AnimationGroup(
-            Unwrite(proof_x),
+            Unwrite(proof),
             Unwrite(edge_labels_and_angle),
             Uncreate(triangle_x_1_move)
         ))
 
         # move second triangle
         triangle_x_2_move = triangle_x_2.copy()
-        self.play(triangle_x_2_move.animate.move_to(RIGHT*3.5+UP*1.10).scale(3))
+        self.play(triangle_x_2_move.animate.move_to(RIGHT*3.5+UP*1.25).scale(2))
+
+        self.wait()
+
+        # write labels and angle for this new triangle
+        vertices = triangle_x_2_move.get_vertices()
+        hypotenuse_label = MathTex("c_2")
+        center_coordinates = Line(vertices[0], vertices[1]).get_center()
+        hypotenuse_label.move_to([center_coordinates[0]-0.3, center_coordinates[1]+0.3, center_coordinates[2]])
+
+        edge_labels_and_angle = VGroup(
+            hypotenuse_label,
+            MathTex("1").next_to(Line(vertices[1], vertices[2])),
+            MathTex(r"\Delta x").next_to(Line(vertices[2], vertices[0]), DOWN),
+            Angle(
+                Line(vertices[2], vertices[0]),
+                Line(vertices[2], vertices[1]),
+                elbow=True
+            )
+        )
+        self.play(Write(edge_labels_and_angle))
+
+        # write proof
+        proof = MathTex(
+            r"""\sin{\theta} &= \frac{1}{c_2} \Rightarrow c_2 = \frac{1}{\sin{\theta}} \\
+                \cos{\theta} &= \frac{\Delta x}{c_2} \Rightarrow \Delta x = c_2 \cdot \cos{\theta} \\
+                \Delta x &= \frac{\cos{\theta}}{\sin{\theta}} = \frac{1}{\tan{\theta}}""",
+            font_size=32
+        ).move_to(RIGHT*3.5+DOWN*1.75)
+
+        self.play(Write(proof, run_time=5))
+        self.wait(10)
+
+        # simplify proof
+        formula = MathTex(r"\Delta x = \frac{1}{\tan{\theta}}").move_to(RIGHT*3.5+DOWN*1.75)
+        self.play(Transform(proof, formula))
+
+        self.wait(3)
+
+        # delete this triangle and formula
+        # uncreate triangles on number plane
+        self.play(AnimationGroup(
+            Unwrite(proof),
+            Unwrite(edge_labels_and_angle),
+            Uncreate(triangle_x_2_move),
+
+            Uncreate(triangle_x_1),
+            Uncreate(triangle_x_2)
+        ))
+
+        self.wait()
+
+        # create two new triangles on number plane
+        triangle_y_1 = Polygon(
+            number_plane.c2p(1.5, 1.5),
+            number_plane.c2p(2, 2.125),
+            number_plane.c2p(2, 1.5),
+            color=GREEN
+        )
+        triangle_y_2 = Polygon(
+            number_plane.c2p(2, 2.125),
+            number_plane.c2p(3, 3.375),
+            number_plane.c2p(3, 2.125),
+            color=BLUE
+        )
+
+        self.play(AnimationGroup(
+            Transform(
+                title_text,
+                MathTex(r"\textrm{Vertical intersections}").move_to(title_text)
+            ),
+            Create(triangle_y_1),
+            Create(triangle_y_2)
+        ))
+
+        self.wait()
+
+        # move first triangle
+        triangle_y_1_move = triangle_y_1.copy()
+        self.play(triangle_y_1_move.animate.move_to(RIGHT*3.5+UP*1.25).scale(3.25))
+
+        # write labels for each edge of the triangle and draw angle
+        vertices = triangle_y_1_move.get_vertices()
+        hypotenuse_label = MathTex("c_3")
+        center_coordinates = Line(vertices[0], vertices[1]).get_center()
+        hypotenuse_label.move_to([center_coordinates[0]-0.3, center_coordinates[1]+0.3, center_coordinates[2]])
+
+        edge_labels_and_angle = VGroup(
+            hypotenuse_label,
+            MathTex("y_i").next_to(Line(vertices[1], vertices[2])),
+            MathTex("1-p_x").next_to(Line(vertices[2], vertices[0]), DOWN),
+            Angle(
+                Line(vertices[2], vertices[0]),
+                Line(vertices[2], vertices[1]),
+                elbow=True
+            )
+        )
+        self.play(Write(edge_labels_and_angle))
+
+        # write the proof
+        proof = MathTex(
+            r"""\sin{\theta} &= \frac{y_i}{c_3} \Rightarrow y_i = c_3 \cdot \sin{\theta} \\
+                \cos{\theta} &= \frac{1-p_x}{c_3} \Rightarrow c_3 = \frac{1-p_x}{\cos{\theta}} \\
+                y_i &= \frac{(1-p_x)\sin{\theta}}{\cos{\theta}} = (1-p_x)\tan{\theta}""",
+            font_size=32
+        ).move_to(RIGHT*3.5+DOWN*1.75)
+
+        self.play(Write(proof, run_time=5))
+        self.wait(10)
+
+        # simplify proof
+        formula = MathTex(r"y_i = (1-p_x)\tan{\theta}").move_to(RIGHT*3.5+DOWN*1.75)
+        self.play(Transform(proof, formula))
+
+        self.wait(3)
+
+        # delete this triangle and formula
+        self.play(AnimationGroup(
+            Unwrite(proof),
+            Unwrite(edge_labels_and_angle),
+            Uncreate(triangle_y_1_move)
+        ))
+
+        self.wait()
+
+        # move triangle
+        triangle_y_2_move = triangle_y_2.copy()
+        self.play(triangle_y_2_move.animate.move_to(RIGHT*3.5+UP*1.25).scale(1.75))
+
+        # write labels for each edge of the triangle and draw angle
+        vertices = triangle_y_2_move.get_vertices()
+        hypotenuse_label = MathTex("c_4")
+        center_coordinates = Line(vertices[0], vertices[1]).get_center()
+        hypotenuse_label.move_to([center_coordinates[0]-0.3, center_coordinates[1]+0.3, center_coordinates[2]])
+
+        edge_labels_and_angle = VGroup(
+            hypotenuse_label,
+            MathTex(r"\Delta y").next_to(Line(vertices[1], vertices[2])),
+            MathTex("1").next_to(Line(vertices[2], vertices[0]), DOWN),
+            Angle(
+                Line(vertices[2], vertices[0]),
+                Line(vertices[2], vertices[1]),
+                elbow=True
+            )
+        )
+        self.play(Write(edge_labels_and_angle))
+
+        # write the proof
+        proof = MathTex(
+            r"""\sin{\theta} &= \frac{\Delta y}{c_4} \Rightarrow \Delta y = c_4 \cdot \sin{\theta} \\
+                \cos{\theta} &= \frac{1}{c_4} \Rightarrow c_4 = \frac{1}{\cos{\theta}} \\
+                \Delta y &= \frac{\sin{\theta}}{\cos{\theta}} = \tan{\theta}""",
+            font_size=32
+        ).move_to(RIGHT*3.5+DOWN*1.75)
+
+        self.play(Write(proof, run_time=5))
+        self.wait(10)
+
+        # simplify proof
+        formula = MathTex(r"\Delta y = \tan{\theta}").move_to(RIGHT*3.5+DOWN*1.75)
+        self.play(Transform(proof, formula))
+
+        self.wait(3)
+
+        # delete this triangle and everything
+        self.play(AnimationGroup(
+            FadeOut(proof),
+            FadeOut(edge_labels_and_angle),
+            FadeOut(triangle_y_2_move),
+            FadeOut(title_text),
+            FadeOut(number_plane),
+            FadeOut(blocks),
+            FadeOut(ray),
+            FadeOut(triangle_y_1),
+            FadeOut(triangle_y_2),
+            FadeOut(player_point),
+            FadeOut(p_x_brace),
+            FadeOut(p_y_brace),
+            FadeOut(p_x_brace_label),
+            FadeOut(p_y_brace_label),
+            FadeOut(labels),
+            FadeOut(x_ticks_labels),
+            FadeOut(y_ticks_labels),
+            FadeOut(player_label_1)
+        ))
+
+        algorithm_text = MathTex(
+            r"""& \textrm{Raycasting algorithm for ray facing } +x \textrm{ and } +y \textrm{:} \\
+                & \textrm{1. Cast ray that "sees" horizontal intersections} \\
+                & \textrm{1.1. } Ray \, (Player_x + x_i, Player_y + (1 - p_y)) \\
+                & \textrm{1.2. Increment } Player_x \textrm{ by } \Delta x \textrm{ and } Player_y \textrm{ by } 1 \textrm{ until hit a wall} \\
+                & \textrm{2. Cast ray that "sees" vertical intersections} \\
+                & \textrm{2.1. } Ray \, (Player_x + (1-p_x), Player_y + y_i) \\
+                & \textrm{2.2. Increment } Player_x \textrm{ by } 1 \textrm{ and } Player_y \textrm{ by } \Delta y \textrm{ until hit a wall} \\
+                & \textrm{3. Choose which ray to use} \\
+                & \textrm{3.1. Calculate ray lengths} \\
+                & \textrm{3.2. Choose the ray that has shorter length} \\""",
+            font_size=32
+        )
+        self.play(Write(algorithm_text, run_time=3))
+
+        self.wait(7)
+
+        self.play(FadeOut(algorithm_text))
 
         self.wait()
