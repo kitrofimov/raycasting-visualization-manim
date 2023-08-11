@@ -69,11 +69,19 @@ class TrigonometryProofsScene(Scene):
                 fill_opacity=0.5
             ))
 
+        # play number plane animations
+        self.play(Succession(
+            Create(number_plane, run_time=3),
+            DrawBorderThenFill(blocks),
+            Write(labels),
+            Write(x_ticks_labels),
+            Write(y_ticks_labels)
+        ))
+
         pc_x, pc_y = (1.5, 1.5)
 
         player_point = Dot(number_plane.c2p(pc_x, pc_y), color=WHITE)
         player_label_1 = MathTex("Player").scale(0.6).next_to(player_point, DOWN, buff=0.05)
-        player_label_2 = MathTex("P").scale(0.6).next_to(player_point, DOWN, buff=0.05)
 
         zero_deg_line = DashedLine(number_plane.c2p(pc_x, pc_y), number_plane.c2p(5, pc_y), dash_length=0.15)
         ray = Line(
@@ -82,6 +90,17 @@ class TrigonometryProofsScene(Scene):
         ray_angle = Angle(zero_deg_line, ray)
         ray_angle_label = MathTex(r"\theta").next_to(ray_angle, buff=0.1)
         ray_angle_label.set_y(ray_angle_label.get_y() + 0.2)
+
+        # play ray animations
+        self.play(Succession(
+            Create(player_point, run_time=0.25),
+            Create(zero_deg_line, run_time=1),
+            Create(ray, run_time=1),
+            Create(ray_angle, run_time=0.5),
+            Write(player_label_1),
+            Write(ray_angle_label)
+        ))
+        self.wait(2)
 
         px_brace = Brace(
             Line(number_plane.c2p(1, 1), number_plane.c2p(1.5, 1)),
@@ -95,44 +114,24 @@ class TrigonometryProofsScene(Scene):
         )
         py_brace_label = MathTex("py").scale(0.5).next_to(py_brace, direction=LEFT, buff=0.1)
 
-        # play number plane animations
-        self.play(Succession(
-            Create(number_plane, run_time=3),
-            DrawBorderThenFill(blocks),
-            Write(labels),
-            Write(x_ticks_labels),
-            Write(y_ticks_labels)
-        ))
-
-        # play ray animations
-        self.play(Succession(
-            Create(player_point, run_time=0.25),
-            Create(zero_deg_line, run_time=1),
-            Create(ray, run_time=1),
-            Create(ray_angle, run_time=0.5),
-            Write(player_label_1),
-            Write(ray_angle_label)
-        ))
-
-        self.wait(2)
-
-        # play brace animations
+        # transform Player to P
+        player_label_2 = MathTex("P").scale(0.6).next_to(player_point, DOWN, buff=0.05)
         self.play(Transform(player_label_1, player_label_2))
+
+        # play brace and explanation animations
+        group_explain = VGroup(
+            MathTex(r"P \, (x+px, y+py)").move_to(RIGHT*3.5+UP*0.3),
+            MathTex(r"\theta - \textrm{ray angle}").move_to(RIGHT*3.5+DOWN*0.3),
+        )
         self.play(AnimationGroup(
             Create(px_brace),
             Write(px_brace_label),
             Create(py_brace),
-            Write(py_brace_label)
+            Write(py_brace_label),
+            Write(group_explain)
         ))
 
-        # play P and theta explanation animation
-        group_explain = VGroup(
-            MathTex(r"P(x+px, y+py)").move_to(RIGHT*3.5+UP*0.5),
-            MathTex(r"\theta \textrm{ is ray angle}").move_to(RIGHT*3.5+DOWN*0.5),
-        )
-        self.play(Write(group_explain))
-
-        self.wait(3)
+        self.wait(5)
 
         # uncreate useless things
         group = VGroup(zero_deg_line, ray_angle)
@@ -197,13 +196,13 @@ class TrigonometryProofsScene(Scene):
         ).move_to(RIGHT*3.5+DOWN*1.75)
 
         self.play(Write(proof_x, run_time=5))
-        self.wait(5)
+        self.wait(10)
 
         # simplify proof
         xi_formula = MathTex(r"x_i = \frac{1-py}{\tan{\theta}}").move_to(RIGHT*3.5+DOWN*1.75)
         self.play(Transform(proof_x, xi_formula))
 
-        self.wait()
+        self.wait(3)
 
         # delete this triangle and formula
         self.play(AnimationGroup(
