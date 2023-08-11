@@ -1,3 +1,3 @@
 # raycasting-visualization-manim
 
-This repository contains code for my YouTube video: [[ADD LINK HERE]]
+Source code for [my YouTube video](https://youtu.be/IDmWuSrEkow) made with [Manim](https://www.manim.community/)
